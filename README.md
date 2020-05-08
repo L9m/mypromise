@@ -2,6 +2,8 @@
 
 A simple Promise/A+ implementation.
 
+![npm](https://img.shields.io/npm/v/@l9m/promise)
+
 ## Installation
 
 $ npm install promise
