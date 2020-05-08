@@ -1,6 +1,6 @@
 {
   "name": "@l9m/promise",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A simple Promise/A+ implementation",
   "main": "src/promise.js",
   "scripts": {
