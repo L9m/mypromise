@@ -156,4 +156,87 @@ export class Promise {
       }
     }
   }
+
+  catch(onRejected) {
+    return this.then(null, onRejected)
+  }
+
+  finally(onDone) {
+    if (!isFunction(onDone)) return this.then()
+    const Promise = this.constructor
+    return this.then(
+      value => Promise.resolve(onDone()).then(() => value),
+      reason => Promise.resolve(onDone()).then(() => {throw reason})
+    )
+  }
+  static resolve(x) {
+    if (x instanceof Promise) {
+      return x
+    } else if (isObject(x) || isFunction(x)) {
+      try {
+        const thenable = x.then
+        if (isFunction(thenable)) {
+          return new Promise(resolve => {
+            thenable(resolve);
+          });
+        } else {
+          return new Promise(resolve => resolve(x));
+        }
+      } catch (err) {
+        return new Promise((resolve, reject) => reject(err));
+      }
+    } else {
+      return new Promise((resolve) => resolve(x));
+    }
+  }
+  static reject(x) {
+    if (x instanceof Promise) {
+      return x
+    } else if (isObject(x) || isFunction(x)) {
+      try {
+        const thenable = x.then
+        if (isFunction(thenable)) {
+          return new Promise((resolve, reject) => {
+            thenable(reject);
+          });
+        } else {
+          return new Promise((resolve, reject) => reject(err));
+        }
+      } catch (err) {
+        return new Promise((resolve, reject) => reject(err));
+      }
+    } else {
+      return new Promise((resolve, reject) => reject(err));
+    }
+  }
+
+  static race(promises) {
+    return new Promise(function (resolve, reject) {
+      for (let i = 0; i < promises.length; i++) {
+        Promise.resolve(promises[i]).then(function (value) {
+          return resolve(value)
+        }, function (reason) {
+          return reject(reason)
+        })
+      }
+    })
+  }
+
+  static all(promises) {
+    return new Promise((resolve, reject) => {
+      let fulfilledCount = 0
+      const length = promises.length
+      const rets = Array.from({length})
+      promises.forEach((promise, index) => {
+        Promise.resolve(promise).then(result => {
+          fulfilledCount++
+          rets[index] = result
+          if (fulfilledCount === length) {
+            resolve(rets)
+          }
+        }, reason => reject(reason))
+      })
+    })
+  }
 }
+

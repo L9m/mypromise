@@ -5,7 +5,8 @@
   "main": "src/promise.js",
   "scripts": {
     "build": "babel src -d dist/src && babel test -d dist/test",
-    "test": "node ./dist/test/test.js"
+    "test": "node ./dist/test/test.js",
+    "dev": "node ./dist/src/index.js"
   },
   "repository": {
     "type": "git",
