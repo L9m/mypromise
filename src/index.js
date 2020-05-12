@@ -1,6 +1,5 @@
 import {PENDING, FULFILLED, REJECTED} from './const/state'
-import {isFunction, isObject} from './utils'
-
+import {isFunction, isObject, isArray} from './utils'
 export class Promise {
   constructor(executor) {
     this._callbacks = []
@@ -161,12 +160,12 @@ export class Promise {
     return this.then(null, onRejected)
   }
 
-  finally(onDone) {
+  finally(callback) {
     if (!isFunction(onDone)) return this.then()
     const Promise = this.constructor
     return this.then(
-      value => Promise.resolve(onDone()).then(() => value),
-      reason => Promise.resolve(onDone()).then(() => {throw reason})
+      value => Promise.resolve(callback()).then(() => value),
+      reason => Promise.resolve(callback()).then(() => {throw reason})
     )
   }
   static resolve(x) {
@@ -212,27 +211,29 @@ export class Promise {
 
   static race(promises) {
     return new Promise(function (resolve, reject) {
+      if (!isArray(arr)) {
+        return reject(new TypeError('Promise.race accepts an array'))
+      }
       for (let i = 0; i < promises.length; i++) {
-        Promise.resolve(promises[i]).then(function (value) {
-          return resolve(value)
-        }, function (reason) {
-          return reject(reason)
-        })
+        Promise.resolve(promises[i]).then(value => resolve(value), reason => reject(reason))
       }
     })
   }
 
   static all(promises) {
     return new Promise((resolve, reject) => {
-      let fulfilledCount = 0
+      if (!isArray(arr)) {
+        return reject(new TypeError('Promise.all accepts an array'))
+      }
+      let count = 0
       const length = promises.length
-      const rets = Array.from({length})
+      const results = Array.from({length})
       promises.forEach((promise, index) => {
-        Promise.resolve(promise).then(result => {
-          fulfilledCount++
-          rets[index] = result
-          if (fulfilledCount === length) {
-            resolve(rets)
+        Promise.resolve(promise).then(value => {
+          count++
+          results[index] = value
+          if (count === length) {
+            resolve(results)
           }
         }, reason => reject(reason))
       })

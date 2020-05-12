@@ -202,15 +202,15 @@ var Promise = /*#__PURE__*/function () {
     }
   }, {
     key: "finally",
-    value: function _finally(onDone) {
+    value: function _finally(callback) {
       if (!(0, _utils.isFunction)(onDone)) return this.then();
       var Promise = this.constructor;
       return this.then(function (value) {
-        return Promise.resolve(onDone()).then(function () {
+        return Promise.resolve(callback()).then(function () {
           return value;
         });
       }, function (reason) {
-        return Promise.resolve(onDone()).then(function () {
+        return Promise.resolve(callback()).then(function () {
           throw reason;
         });
       });
@@ -277,6 +277,10 @@ var Promise = /*#__PURE__*/function () {
     key: "race",
     value: function race(promises) {
       return new Promise(function (resolve, reject) {
+        if (!(0, _utils.isArray)(arr)) {
+          return reject(new TypeError('Promise.race accepts an array'));
+        }
+
         for (var i = 0; i < promises.length; i++) {
           Promise.resolve(promises[i]).then(function (value) {
             return resolve(value);
@@ -290,18 +294,22 @@ var Promise = /*#__PURE__*/function () {
     key: "all",
     value: function all(promises) {
       return new Promise(function (resolve, reject) {
-        var fulfilledCount = 0;
+        if (!(0, _utils.isArray)(arr)) {
+          return reject(new TypeError('Promise.all accepts an array'));
+        }
+
+        var count = 0;
         var length = promises.length;
-        var rets = Array.from({
+        var results = Array.from({
           length: length
         });
         promises.forEach(function (promise, index) {
-          Promise.resolve(promise).then(function (result) {
-            fulfilledCount++;
-            rets[index] = result;
+          Promise.resolve(promise).then(function (value) {
+            count++;
+            results[index] = value;
 
-            if (fulfilledCount === length) {
-              resolve(rets);
+            if (count === length) {
+              resolve(results);
             }
           }, function (reason) {
             return reject(reason);

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isObject = exports.isFunction = void 0;
+exports.isArray = exports.isObject = exports.isFunction = void 0;
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -18,3 +18,9 @@ var isObject = function isObject(val) {
 };
 
 exports.isObject = isObject;
+
+var isArray = function isArray(val) {
+  return val && typeof Object.prototype.toString.call(val) === '[object Array]';
+};
+
+exports.isArray = isArray;
