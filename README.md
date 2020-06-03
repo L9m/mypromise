@@ -11,7 +11,7 @@ A simple Promise/A+ implementation.
 
 ## Installation
 
-$ npm install promise
+$ npm install @l9m/promise
 
 ## Usage
 
